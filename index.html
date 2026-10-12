@@ -70,6 +70,7 @@
       box-shadow: 0 2px 6px rgba(255, 209, 220, 0.5);
     }
 
+    /* 側邊抽屜 */
     .drawer-overlay {
       position: fixed;
       top: 0;
@@ -92,13 +93,13 @@
       position: fixed;
       top: 0;
       right: -320px;
-      width: 290px;
+      width: 300px;
       height: 100vh;
       background: var(--bg-color);
       box-shadow: -5px 0 25px rgba(0,0,0,0.15);
       transition: right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
       z-index: 100;
-      padding: 24px 18px;
+      padding: 20px 16px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -131,6 +132,45 @@
       cursor: pointer;
     }
 
+    .back-menu-btn {
+      background: var(--bg-color);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--text-color);
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    /* 抽屜內部選項按鈕 */
+    .drawer-nav-btn {
+      width: 100%;
+      background: #FFF;
+      border: 2.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 14px;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--text-color);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 10px rgba(230, 190, 100, 0.15);
+      transition: transform 0.15s;
+    }
+
+    .drawer-nav-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* 緊急卡片 */
     .emergency-card {
       background: #FFF;
       border: 2px solid var(--border-color);
@@ -169,6 +209,44 @@
       font-weight: 900;
       text-decoration: none;
       margin-top: 4px;
+    }
+
+    /* 餐廳搜尋卡片 */
+    .restaurant-card {
+      background: #FFF;
+      border: 2px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .res-name {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: var(--accent-orange);
+      margin-bottom: 4px;
+    }
+
+    .res-info {
+      font-size: 0.78rem;
+      color: var(--light-text);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .nav-btn {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      background: #EBF4FC;
+      color: #5B9BD5;
+      border: 1px solid #D0E3F7;
+      padding: 5px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-decoration: none;
     }
 
     .trip-counter-badge {
@@ -478,42 +556,76 @@
     <div class="trip-counter-badge" id="tripCounter">計算旅程天數中...</div>
   </header>
 
+  <!-- 側邊抽屜遮罩 -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+
+  <!-- 側邊抽屜內容 -->
   <div class="drawer-menu" id="drawerMenu">
     <div class="drawer-header">
-      <h2>🆘 獨旅緊急求助資訊</h2>
+      <h2 id="drawerTitle">🧰 隨行救急包</h2>
       <button class="close-btn" onclick="toggleDrawer(false)">✕</button>
     </div>
 
-    <div class="emergency-card">
-      <div class="emergency-title">🚓 日本報警專線</div>
-      <div class="emergency-item">遇到犯罪、遺失物、急難求助：</div>
-      <a href="tel:110" class="call-btn">📞 直撥 110</a>
+    <!-- 抽屜主頁面：選項按鈕區 -->
+    <div id="drawerMainPage">
+      <button class="drawer-nav-btn" onclick="showDrawerPage('emergency')">
+        <span>🆘 緊急聯絡電話</span>
+        <span>❯</span>
+      </button>
+
+      <button class="drawer-nav-btn" onclick="showDrawerPage('food')">
+        <span>🍽️ 附近好吃的</span>
+        <span>❯</span>
+      </button>
     </div>
 
-    <div class="emergency-card">
-      <div class="emergency-title">🚑 救護車 / 消防專線</div>
-      <div class="emergency-item">突發急性疾病、受傷需送醫：</div>
-      <a href="tel:119" class="call-btn">📞 直撥 119</a>
+    <!-- 抽屜子頁面 1：緊急聯絡電話 -->
+    <div id="drawerEmergencyPage" style="display: none;">
+      <button class="back-menu-btn" onclick="showDrawerPage('main')">← 返回主選單</button>
+
+      <div class="emergency-card">
+        <div class="emergency-title">🚓 日本報警專線</div>
+        <div class="emergency-item">遇到犯罪、遺失物、急難求助：</div>
+        <a href="tel:110" class="call-btn">📞 直撥 110</a>
+      </div>
+
+      <div class="emergency-card">
+        <div class="emergency-title">🚑 救護車 / 消防專線</div>
+        <div class="emergency-item">突發急性疾病、受傷需送醫：</div>
+        <a href="tel:119" class="call-btn">📞 直撥 119</a>
+      </div>
+
+      <div class="emergency-card">
+        <div class="emergency-title">🇹🇼 台北駐日經濟文化代表處</div>
+        <div class="emergency-item"><b>東京總處緊急電話：</b><br>090-3207-0487</div>
+        <a href="tel:09032070487" class="call-btn">📞 撥打代表處</a>
+        <div class="emergency-item" style="margin-top: 8px;"><b>電子郵件：</b><br>taiwan@roc-taiwan.org</div>
+      </div>
+
+      <div class="emergency-card">
+        <div class="emergency-title">🏯 駐大阪辦事處（含名古屋）</div>
+        <div class="emergency-item"><b>緊急電話：</b>090-8794-4798</div>
+        <a href="tel:09087944798" class="call-btn">📞 撥打大阪辦事處</a>
+      </div>
+
+      <div class="emergency-card">
+        <div class="emergency-title">🍜 駐福岡辦事處（含福岡）</div>
+        <div class="emergency-item"><b>緊急電話：</b>090-1922-5740</div>
+        <a href="tel:09019225740" class="call-btn">📞 撥打福岡辦事處</a>
+      </div>
     </div>
 
-    <div class="emergency-card">
-      <div class="emergency-title">🇹🇼 台北駐日經濟文化代表處</div>
-      <div class="emergency-item"><b>東京總處緊急電話：</b><br>090-3207-0487</div>
-      <a href="tel:09032070487" class="call-btn">📞 撥打代表處</a>
-      <div class="emergency-item" style="margin-top: 8px;"><b>電子郵件：</b><br>taiwan@roc-taiwan.org</div>
-    </div>
+    <!-- 抽屜子頁面 2：附近好吃的 -->
+    <div id="drawerFoodPage" style="display: none;">
+      <button class="back-menu-btn" onclick="showDrawerPage('main')">← 返回主選單</button>
 
-    <div class="emergency-card">
-      <div class="emergency-title">🏯 駐大阪辦事處（含名古屋）</div>
-      <div class="emergency-item"><b>緊急電話：</b>090-8794-4798</div>
-      <a href="tel:09087944798" class="call-btn">📞 撥打大阪辦事處</a>
-    </div>
+      <button class="action-btn" style="margin-bottom: 12px; font-size: 0.85rem; padding: 10px;" onclick="getLocationAndSearch()">🎯 定位並搜尋周邊美食</button>
 
-    <div class="emergency-card">
-      <div class="emergency-title">🍜 駐福岡辦事處（含福岡）</div>
-      <div class="emergency-item"><b>緊急電話：</b>090-1922-5740</div>
-      <a href="tel:09019225740" class="call-btn">📞 撥打福岡辦事處</a>
+      <div id="restaurantList">
+        <div style="text-align: center; font-size: 0.82rem; color: var(--light-text); font-weight: 700; margin-top: 10px;">
+          點擊上方按鈕開啟 GPS 定位，自動探索 800m 內的美味餐廳！
+        </div>
+      </div>
     </div>
   </div>
 
@@ -614,16 +726,99 @@
       fukuoka: { lat: 33.5902, lng: 130.4017 }
     };
 
+    // 抽屜頁面切換機制
     function toggleDrawer(open) {
       var overlay = document.getElementById('drawerOverlay');
       var menu = document.getElementById('drawerMenu');
       if (open) {
         overlay.classList.add('active');
         menu.classList.add('active');
+        showDrawerPage('main'); // 開啟時預設為選單主頁面
       } else {
         overlay.classList.remove('active');
         menu.classList.remove('active');
       }
+    }
+
+    function showDrawerPage(pageName) {
+      var mainPage = document.getElementById('drawerMainPage');
+      var emergencyPage = document.getElementById('drawerEmergencyPage');
+      var foodPage = document.getElementById('drawerFoodPage');
+      var title = document.getElementById('drawerTitle');
+
+      mainPage.style.display = 'none';
+      emergencyPage.style.display = 'none';
+      foodPage.style.display = 'none';
+
+      if (pageName === 'main') {
+        mainPage.style.display = 'block';
+        title.textContent = '🧰 隨行救急包';
+      } else if (pageName === 'emergency') {
+        emergencyPage.style.display = 'block';
+        title.textContent = '🆘 緊急求助電話';
+      } else if (pageName === 'food') {
+        foodPage.style.display = 'block';
+        title.textContent = '🍽️ 附近好吃的';
+      }
+    }
+
+    // 手機 GPS 定位與搜尋附近餐廳
+    function getLocationAndSearch() {
+      var listDiv = document.getElementById('restaurantList');
+      listDiv.innerHTML = '<div style="text-align:center; font-size:0.85rem; font-weight:700; color:var(--accent-orange); margin-top:15px;">正在定位並搜尋周邊美食...📍</div>';
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            searchNearbyRestaurants(lat, lng);
+          },
+          function(error) {
+            alert('無法取得定位，請確認手機瀏覽器已允許 GPS 定位權限！');
+            listDiv.innerHTML = '<div style="text-align:center; font-size:0.8rem; color:#D85A75; margin-top:10px;">定位失敗，請允許讀取位置。</div>';
+          }
+        );
+      } else {
+        alert('您的瀏覽器不支援地理定位功能。');
+      }
+    }
+
+    function searchNearbyRestaurants(lat, lng) {
+      var radius = 800; // 搜尋 800 公尺之內
+      var query = '[out:json];node(around:' + radius + ',' + lat + ',' + lng + ')[amenity=restaurant];out 10;';
+      var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
+
+      fetch(url)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var listDiv = document.getElementById('restaurantList');
+          listDiv.innerHTML = '';
+
+          if (!data.elements || data.elements.length === 0) {
+            listDiv.innerHTML = '<div style="text-align:center; font-size:0.85rem; color:var(--light-text); font-weight:700; margin-top:10px;">附近 800m 內未找到公開餐廳資料 😅</div>';
+            return;
+          }
+
+          data.elements.forEach(function(place) {
+            var name = (place.tags && place.tags.name) ? place.tags.name : "在地美味餐館";
+            var cuisine = (place.tags && place.tags.cuisine) ? place.tags.cuisine : "日本在地料理";
+            var mapLink = 'https://www.google.com/maps/search/?api=1&query=' + place.lat + ',' + place.lon;
+
+            var cardHtml = 
+              '<div class="restaurant-card">' +
+                '<div class="res-name">🍱 ' + name + '</div>' +
+                '<div class="res-info">類別：' + cuisine + '</div>' +
+                '<a class="nav-btn" href="' + mapLink + '" target="_blank">🗺️ Google 地圖導航</a>' +
+              '</div>';
+            
+            listDiv.innerHTML += cardHtml;
+          });
+        })
+        .catch(function(err) {
+          console.log(err);
+          document.getElementById('restaurantList').innerHTML = '<div style="text-align:center; font-size:0.8rem; color:#D85A75; margin-top:10px;">連線失敗，請稍後重試。</div>';
+        });
     }
 
     var quotes = [
@@ -757,7 +952,6 @@
       } catch(e) { console.log(e); }
     }
 
-    // 指定使用 JMA (日本氣象廳) 氣象模型 API，解決 CORS 並確保數據極精準
     function fetchWeather() {
       try {
         var citySelect = document.getElementById('citySelect');
@@ -835,7 +1029,6 @@
         tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
         popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
 
-        // Weathercode 轉圖示
         var icon = '🌤️';
         if (code >= 51) icon = '🌧️';
         else if (code === 0) icon = '☀️';
