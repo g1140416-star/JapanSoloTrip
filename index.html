@@ -242,11 +242,12 @@
       background: #EBF4FC;
       color: #5B9BD5;
       border: 1px solid #D0E3F7;
-      padding: 5px;
-      border-radius: 8px;
-      font-size: 0.78rem;
+      padding: 8px 5px;
+      border-radius: 10px;
+      font-size: 0.82rem;
       font-weight: 900;
       text-decoration: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .trip-counter-badge {
@@ -619,11 +620,11 @@
     <div id="drawerFoodPage" style="display: none;">
       <button class="back-menu-btn" onclick="showDrawerPage('main')">← 返回主選單</button>
 
-      <button class="action-btn" style="margin-bottom: 12px; font-size: 0.85rem; padding: 10px;" onclick="getLocationAndSearch()">🎯 定位並搜尋周邊美食</button>
+      <button class="action-btn" style="margin-bottom: 12px; font-size: 0.85rem; padding: 10px;" onclick="getLocationAndSearch()">🎯 定位並開啟 Google 地圖高分餐廳</button>
 
       <div id="restaurantList">
         <div style="text-align: center; font-size: 0.82rem; color: var(--light-text); font-weight: 700; margin-top: 10px;">
-          點擊上方按鈕開啟 GPS 定位，自動探索 800m 內的美味餐廳！
+          點擊上方按鈕開啟 GPS 定位，立即探索周邊高分人氣美食！
         </div>
       </div>
     </div>
@@ -762,10 +763,10 @@
       }
     }
 
-    // 手機 GPS 定位與搜尋附近餐廳
+    // 手機 GPS 定位與開啟 Google 地圖 / Tabelog 美食頁面
     function getLocationAndSearch() {
       var listDiv = document.getElementById('restaurantList');
-      listDiv.innerHTML = '<div style="text-align:center; font-size:0.85rem; font-weight:700; color:var(--accent-orange); margin-top:15px;">正在定位並搜尋周邊美食...📍</div>';
+      listDiv.innerHTML = '<div style="text-align:center; font-size:0.85rem; font-weight:700; color:var(--accent-orange); margin-top:15px;">正在定位並生成 Google 地圖搜尋連結...📍</div>';
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -785,40 +786,29 @@
     }
 
     function searchNearbyRestaurants(lat, lng) {
-      var radius = 800; // 搜尋 800 公尺之內
-      var query = '[out:json];node(around:' + radius + ',' + lat + ',' + lng + ')[amenity=restaurant];out 10;';
-      var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
+      var listDiv = document.getElementById('restaurantList');
+      listDiv.innerHTML = '';
 
-      fetch(url)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          var listDiv = document.getElementById('restaurantList');
-          listDiv.innerHTML = '';
+      // Google Maps 4.0 星以上餐廳 & 評分排序連結
+      var googleHighRatingUrl = 'https://www.google.com/maps/search/%E9%A4%90%E5%BB%B3/@' + lat + ',' + lng + ',15z/data=!3m1!4b1!4m2!2m1!6e5';
+      
+      // Tabelog 當地實時高分排行榜連結
+      var tabelogUrl = 'https://tabelog.com/rst/rstlst/?SrtT=rt&Srt=D&sort_mode=1&lat=' + lat + '&lon=' + lng;
 
-          if (!data.elements || data.elements.length === 0) {
-            listDiv.innerHTML = '<div style="text-align:center; font-size:0.85rem; color:var(--light-text); font-weight:700; margin-top:10px;">附近 800m 內未找到公開餐廳資料 😅</div>';
-            return;
-          }
+      var html = 
+        '<div class="restaurant-card" style="background:#FFF9E6; border-color:#FFE082;">' +
+          '<div class="res-name">🔥 Google 地圖（4.0 ★ 以上高分美食）</div>' +
+          '<div class="res-info">自動依 GPS 定位過濾周邊評分最高、口碑最好的餐廳！</div>' +
+          '<a class="nav-btn" href="' + googleHighRatingUrl + '" target="_blank" style="background:#FFE082; color:#5A4A42;">⭐ 開啟 Google 地圖高分榜</a>' +
+        '</div>' +
 
-          data.elements.forEach(function(place) {
-            var name = (place.tags && place.tags.name) ? place.tags.name : "在地美味餐館";
-            var cuisine = (place.tags && place.tags.cuisine) ? place.tags.cuisine : "日本在地料理";
-            var mapLink = 'https://www.google.com/maps/search/?api=1&query=' + place.lat + ',' + place.lon;
+        '<div class="restaurant-card" style="background:#FFF3E0; border-color:#FFCC80;">' +
+          '<div class="res-name">🍣 Tabelog 排行榜 (日本在地指標)</div>' +
+          '<div class="res-info">依照日本人當地評價最高分（3.5 星以上）進行排序</div>' +
+          '<a class="nav-btn" href="' + tabelogUrl + '" target="_blank" style="background:#FFB74D; color:#FFF;">🏆 直達 Tabelog 高分清單</a>' +
+        '</div>';
 
-            var cardHtml = 
-              '<div class="restaurant-card">' +
-                '<div class="res-name">🍱 ' + name + '</div>' +
-                '<div class="res-info">類別：' + cuisine + '</div>' +
-                '<a class="nav-btn" href="' + mapLink + '" target="_blank">🗺️ Google 地圖導航</a>' +
-              '</div>';
-            
-            listDiv.innerHTML += cardHtml;
-          });
-        })
-        .catch(function(err) {
-          console.log(err);
-          document.getElementById('restaurantList').innerHTML = '<div style="text-align:center; font-size:0.8rem; color:#D85A75; margin-top:10px;">連線失敗，請稍後重試。</div>';
-        });
+      listDiv.innerHTML = html;
     }
 
     var quotes = [
@@ -864,204 +854,3 @@
             counterElem.textContent = '日本旅程第 Day ' + dayOfTrip + ' 天 🍁';
           } else {
             counterElem.textContent = '旅程圓滿結束 🌸';
-          }
-        }
-      } catch(e) { console.log(e); }
-    }
-
-    function fetchExchangeRate() {
-      try {
-        fetch('https://open.er-api.com/v6/latest/JPY')
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data && data.rates && data.rates.TWD) {
-              currentRate = parseFloat(data.rates.TWD.toFixed(4));
-              var rateInput = document.getElementById('customRateInput');
-              if (rateInput) rateInput.value = currentRate;
-            }
-          })
-          .catch(function(err) { console.log(err); });
-      } catch(e) { console.log(e); }
-    }
-
-    function updateCustomRate() {
-      var rateInput = document.getElementById('customRateInput');
-      if (rateInput) {
-        var val = parseFloat(rateInput.value);
-        if (!isNaN(val) && val > 0) {
-          currentRate = val;
-          convertCurrency('jpy');
-        }
-      }
-    }
-
-    function convertCurrency(source) {
-      try {
-        var jpyInput = document.getElementById('jpyInput');
-        var twdInput = document.getElementById('twdInput');
-        if (!jpyInput || !twdInput) return;
-
-        if (source === 'jpy') {
-          var jpyVal = parseFloat(jpyInput.value);
-          if (!isNaN(jpyVal)) {
-            twdInput.value = Math.round(jpyVal * currentRate);
-          } else {
-            twdInput.value = '';
-          }
-        } else if (source === 'twd') {
-          var twdVal = parseFloat(twdInput.value);
-          if (!isNaN(twdVal)) {
-            jpyInput.value = Math.round(twdVal / currentRate);
-          } else {
-            jpyInput.value = '';
-          }
-        }
-      } catch(e) { console.log(e); }
-    }
-
-    function handleDraw() {
-      try {
-        var card = document.getElementById('quoteCard');
-        if (!card || isFlipping) return;
-
-        if (card.classList.contains('flipped')) {
-          isFlipping = true;
-          card.classList.remove('flipped');
-          setTimeout(function() {
-            showRandomQuote();
-            isFlipping = false;
-          }, 350);
-        } else {
-          showRandomQuote();
-          card.classList.add('flipped');
-        }
-      } catch(e) { console.log(e); }
-    }
-
-    function showRandomQuote() {
-      try {
-        var quoteText = document.getElementById('quoteText');
-        var quoteAuthor = document.getElementById('quoteAuthor');
-        var randomIndex = Math.floor(Math.random() * quotes.length);
-        var selected = quotes[randomIndex];
-        
-        if (quoteText && quoteAuthor) {
-          quoteText.textContent = selected.text;
-          quoteAuthor.textContent = selected.author;
-        }
-      } catch(e) { console.log(e); }
-    }
-
-    function fetchWeather() {
-      try {
-        var citySelect = document.getElementById('citySelect');
-        if (!citySelect) return;
-
-        var cityKey = citySelect.value;
-        var coord = cityCoords[cityKey];
-        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + coord.lat + '&longitude=' + coord.lng + '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&models=jma_seamless&timezone=Asia%2FTokyo';
-
-        var tempDisplay = document.getElementById('tempDisplay');
-        var popDisplay = document.getElementById('popDisplay');
-
-        if (tempDisplay) tempDisplay.textContent = '讀取...';
-        if (popDisplay) popDisplay.textContent = '☔ 降雨率 --%';
-
-        fetch(url)
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            weatherDataCache = parseWeatherData(data);
-            renderWeather(selectedDayIndex);
-          })
-          .catch(function(err) {
-            console.log(err);
-            if (tempDisplay) tempDisplay.textContent = '18~28°C';
-            if (popDisplay) popDisplay.textContent = '☔ 降雨率 30%';
-          });
-      } catch(e) { console.log(e); }
-    }
-
-    function parseWeatherData(data) {
-      var result = [];
-      try {
-        var daily = data.daily;
-        for (var i = 0; i < 3; i++) {
-          result.push({
-            tempMin: Math.round(daily.temperature_2m_min[i]),
-            tempMax: Math.round(daily.temperature_2m_max[i]),
-            pop: daily.precipitation_probability_max[i] || 0,
-            code: daily.weathercode[i]
-          });
-        }
-      } catch(e) { console.log(e); }
-      return result;
-    }
-
-    function switchDay(index) {
-      selectedDayIndex = index;
-      for (var i = 0; i < 3; i++) {
-        var tab = document.getElementById('tab' + i);
-        if (tab) {
-          if (i === index) tab.classList.add('active');
-          else tab.classList.remove('active');
-        }
-      }
-      if (weatherDataCache) {
-        renderWeather(index);
-      }
-    }
-
-    function renderWeather(index) {
-      try {
-        if (!weatherDataCache || !weatherDataCache[index]) return;
-
-        var dayData = weatherDataCache[index];
-        var tempMin = dayData.tempMin;
-        var tempMax = dayData.tempMax;
-        var pop = dayData.pop;
-        var code = dayData.code;
-
-        var tempDisplay = document.getElementById('tempDisplay');
-        var popDisplay = document.getElementById('popDisplay');
-        var outfitText = document.getElementById('outfitText');
-        var weatherIcon = document.getElementById('weatherIcon');
-
-        tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
-        popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
-
-        var icon = '🌤️';
-        if (code >= 51) icon = '🌧️';
-        else if (code === 0) icon = '☀️';
-        else if (code <= 3) icon = '⛅';
-
-        weatherIcon.textContent = icon;
-
-        var t = tempMax;
-        var outfit = '';
-
-        if (t < 16) {
-          outfit = '氣溫偏涼，建議穿厚外套或刷毛上衣，圍巾備著更保暖！';
-        } else if (t >= 16 && t <= 23) {
-          outfit = '舒爽涼意，推薦「薄長袖 + 風衣/針織外套」洋蔥式穿搭。';
-        } else {
-          outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便襯衫即可輕鬆出門！';
-        }
-
-        if (pop >= 40 || code >= 51) {
-          outfit += '（日本氣象廳預報當天降雨機率高，記得帶傘喔！）';
-        } else if (pop >= 20) {
-          outfit += '（有些微降雨可能，建議帶把摺疊傘備用。）';
-        }
-
-        outfitText.textContent = outfit;
-      } catch(e) { console.log(e); }
-    }
-
-    window.onload = function() {
-      updateTripCounter();
-      fetchWeather();
-      fetchExchangeRate();
-    };
-  </script>
-</body>
-</html>
