@@ -37,6 +37,7 @@
       padding: 16px 14px 30px 14px;
       background-image: radial-gradient(var(--border-color) 1.5px, transparent 1.5px);
       background-size: 18px 18px;
+      position: relative;
     }
 
     header {
@@ -44,6 +45,7 @@
       margin-bottom: 16px;
       width: 100%;
       max-width: 360px;
+      position: relative;
     }
 
     header h1 {
@@ -51,6 +53,125 @@
       font-weight: 900;
       color: var(--text-color);
       margin-bottom: 6px;
+    }
+
+    /* 抽屜按鈕 (右上角) */
+    .menu-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: var(--soft-pink);
+      color: #D85A75;
+      border: 2px solid #FFB7B2;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 209, 220, 0.5);
+    }
+
+    /* 抽屜選單遮罩與側邊欄 */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(90, 74, 66, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 99;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-menu {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 290px;
+      height: 100vh;
+      background: var(--bg-color);
+      box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+      transition: right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 100;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .drawer-menu.active {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .drawer-header h2 {
+      font-size: 1.15rem;
+      color: var(--accent-orange);
+      font-weight: 900;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    /* 緊急卡片樣式 */
+    .emergency-card {
+      background: #FFF;
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .emergency-title {
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #D85A75;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .emergency-item {
+      font-size: 0.82rem;
+      color: var(--text-color);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .call-btn {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      background: var(--soft-yellow);
+      color: var(--accent-orange);
+      border: 1.5px solid var(--border-color);
+      padding: 6px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-decoration: none;
+      margin-top: 4px;
     }
 
     .trip-counter-badge {
@@ -133,7 +254,6 @@
       gap: 4px;
     }
 
-    /* 💴 匯率計算器特化樣式 */
     .currency-header {
       font-size: 1.05rem;
       font-weight: 900;
@@ -312,9 +432,50 @@
 <body>
 
   <header>
+    <button class="menu-btn" onclick="toggleDrawer(true)">☰ 救急包</button>
     <h1>✨ 日本隨行小卡 ✨</h1>
     <div class="trip-counter-badge" id="tripCounter">計算旅程天數中...</div>
   </header>
+
+  <!-- 抽屜選單側邊欄 -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+  <div class="drawer-menu" id="drawerMenu">
+    <div class="drawer-header">
+      <h2>🆘 獨旅緊急求助資訊</h2>
+      <button class="close-btn" onclick="toggleDrawer(false)">✕</button>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-title">🚓 日本報警專線</div>
+      <div class="emergency-item">遇到犯罪、遺失物、急難求助：</div>
+      <a href="tel:110" class="call-btn">📞 直撥 110</a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-title">🚑 救護車 / 消防專線</div>
+      <div class="emergency-item">突發急性疾病、受傷需送醫：</div>
+      <a href="tel:119" class="call-btn">📞 直撥 119</a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-title">🇹🇼 台北駐日經濟文化代表處</div>
+      <div class="emergency-item"><b>東京總處緊急電話：</b><br>090-3207-0487</div>
+      <a href="tel:09032070487" class="call-btn">📞 撥打代表處</a>
+      <div class="emergency-item" style="margin-top: 8px;"><b>電子郵件：</b><br>taiwan@roc-taiwan.org</div>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-title">🏯 駐大阪辦事處（含名古屋）</div>
+      <div class="emergency-item"><b>緊急電話：</b>090-8794-4798</div>
+      <a href="tel:09087944798" class="call-btn">📞 撥打大阪辦事處</a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-title">🍜 駐福岡辦事處（含福岡）</div>
+      <div class="emergency-item"><b>緊急電話：</b>090-1922-5740</div>
+      <a href="tel:09019225740" class="call-btn">📞 撥打福岡辦事處</a>
+    </div>
+  </div>
 
   <!-- 天氣與穿衣提醒 -->
   <div class="section-card">
@@ -336,7 +497,7 @@
     </div>
   </div>
 
-  <!-- 💴 日幣匯率計算器（含可自訂匯率功能） -->
+  <!-- 💴 日幣匯率計算器 -->
   <div class="section-card">
     <div class="currency-header">
       <span>💴 日幣匯率計算器</span>
@@ -392,6 +553,18 @@
   <script>
     var currentRate = 0.215;
     var isFlipping = false;
+
+    function toggleDrawer(open) {
+      var overlay = document.getElementById('drawerOverlay');
+      var menu = document.getElementById('drawerMenu');
+      if (open) {
+        overlay.classList.add('active');
+        menu.classList.add('active');
+      } else {
+        overlay.classList.remove('active');
+        menu.classList.remove('active');
+      }
+    }
 
     var quotes = [
       { text: "發現的真正旅程，不在於尋找新風景，而在於擁有新眼光。", author: "—— 馬塞爾·普魯斯特" },
@@ -462,7 +635,7 @@
         var val = parseFloat(rateInput.value);
         if (!isNaN(val) && val > 0) {
           currentRate = val;
-          convertCurrency('jpy'); // 匯率更新後自動重算金額
+          convertCurrency('jpy');
         }
       }
     }
