@@ -519,49 +519,43 @@
     </div>
   </div>
 
-  <!-- 抽卡卡片（擬真照風格：黑色長毛狗、嘴邊銀灰毛、胸前圍巾長毛、微笑吐舌） -->
+  <!-- 抽卡卡片（純粹無裝飾的長毛黑狗，嘴邊銀灰毛、胸前蓬鬆長毛、微笑吐舌） -->
   <div class="card-container" id="cardContainer" onclick="handleDraw()">
     <div class="card" id="quoteCard">
       <div class="card-face card-front">
         <svg class="character-img" viewBox="0 0 100 100">
-          <!-- 1. 胸前豐厚蓬鬆長毛圍巾 (灰色/銀白羽狀毛層) -->
-          <path d="M 20 72 Q 10 90 28 100 L 72 100 Q 90 90 80 72 Z" fill="#242426"/>
-          <path d="M 28 75 Q 16 92 36 100 L 64 100 Q 84 92 72 75 Z" fill="#4B4D52"/>
-          <path d="M 35 78 Q 28 95 48 100 L 52 100 Q 72 95 65 78 Z" fill="#8E9299"/>
+          <!-- 胸前蓬鬆長毛 (銀灰/深灰羽狀毛層) -->
+          <path d="M 20 70 Q 10 90 28 100 L 72 100 Q 90 90 80 70 Z" fill="#242426"/>
+          <path d="M 28 73 Q 16 92 36 100 L 64 100 Q 84 92 72 73 Z" fill="#4B4D52"/>
+          <path d="M 35 76 Q 28 95 48 100 L 52 100 Q 72 95 65 76 Z" fill="#8E9299"/>
 
-          <!-- 2. 下垂柔軟長毛耳 (耳邊長蓬毛) -->
-          <path d="M 26 26 C 12 34, 10 65, 24 76 C 30 78, 33 58, 31 38 Z" fill="#1C1C1E"/>
-          <path d="M 74 26 C 88 34, 90 65, 76 76 C 70 78, 67 58, 69 38 Z" fill="#1C1C1E"/>
-          <path d="M 27 30 C 16 38, 15 60, 26 70 Z" fill="#2D2E33"/>
-          <path d="M 73 30 C 84 38, 85 60, 74 70 Z" fill="#2D2E33"/>
+          <!-- 下垂長毛耳 -->
+          <path d="M 26 24 C 12 32, 10 63, 24 74 C 30 76, 33 56, 31 36 Z" fill="#1C1C1E"/>
+          <path d="M 74 24 C 88 32, 90 63, 76 74 C 70 76, 67 56, 69 36 Z" fill="#1C1C1E"/>
+          <path d="M 27 28 C 16 36, 15 58, 26 68 Z" fill="#2D2E33"/>
+          <path d="M 73 28 C 84 36, 85 58, 74 68 Z" fill="#2D2E33"/>
 
-          <!-- 3. 頭部主體 (黑色毛髮) -->
-          <ellipse cx="50" cy="46" r="26" fill="#222327"/>
+          <!-- 頭部主體 (頂部平滑自然的黑色長毛輪廓) -->
+          <ellipse cx="50" cy="44" rx="26" ry="24" fill="#222327"/>
           
-          <!-- 4. 嘴吻部：照片標誌性的淺灰/銀白色雜毛漸層區塊 -->
-          <ellipse cx="50" cy="57" rx="16" ry="11" fill="#60636B"/>
-          <ellipse cx="50" cy="58" rx="13" ry="9" fill="#999CA3"/>
+          <!-- 嘴吻部：嘴邊銀灰色毛髮漸層 -->
+          <ellipse cx="50" cy="56" rx="16" ry="11" fill="#60636B"/>
+          <ellipse cx="50" cy="57" rx="13" ry="9" fill="#999CA3"/>
 
-          <!-- 5. 溫柔黑亮大眼睛 -->
-          <ellipse cx="37" cy="41" rx="4" ry="4.5" fill="#111112"/>
-          <ellipse cx="63" cy="41" rx="4" ry="4.5" fill="#111112"/>
-          <circle cx="35.5" cy="39.5" r="1.6" fill="#FFFFFF"/>
-          <circle cx="61.5" cy="39.5" r="1.6" fill="#FFFFFF"/>
+          <!-- 溫柔眼神大眼睛 -->
+          <ellipse cx="37" cy="40" rx="4" ry="4.5" fill="#111112"/>
+          <ellipse cx="63" cy="40" rx="4" ry="4.5" fill="#111112"/>
+          <circle cx="35.5" cy="38.5" r="1.6" fill="#FFFFFF"/>
+          <circle cx="61.5" cy="38.5" r="1.6" fill="#FFFFFF"/>
 
-          <!-- 6. 濕潤黑鼻子 -->
-          <path d="M 44 49 L 56 49 C 58 49, 57 54, 50 55 C 43 54, 42 49, 44 49 Z" fill="#0E0E10"/>
-          <ellipse cx="48" cy="50" rx="1.2" ry="0.6" fill="#808080"/>
+          <!-- 濕潤黑鼻子 -->
+          <path d="M 44 48 L 56 48 C 58 48, 57 53, 50 54 C 43 53, 42 48, 44 48 Z" fill="#0E0E10"/>
+          <ellipse cx="48" cy="49" rx="1.2" ry="0.6" fill="#808080"/>
 
-          <!-- 7. 照片招牌：微笑嘴巴 + 寬寬的粉紅微笑舌頭 -->
-          <path d="M 41 57 Q 50 60 59 57" stroke="#1C1C1E" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M 44 58 Q 50 72 56 58 Z" fill="#FF7B99"/>
-          <!-- 舌頭中央中縫線 -->
-          <path d="M 50 60 L 50 67" stroke="#E65C7B" stroke-width="1.2" fill="none"/>
-
-          <!-- 8. 可愛蝴蝶結小飾品 -->
-          <path d="M 42 18 Q 35 12 42 24 Z" fill="#FFD1DC"/>
-          <path d="M 58 18 Q 65 12 58 24 Z" fill="#FFD1DC"/>
-          <circle cx="50" cy="20" r="3" fill="#FF9B42"/>
+          <!-- 微笑嘴巴 + 吐舌頭 -->
+          <path d="M 41 56 Q 50 59 59 56" stroke="#1C1C1E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 44 57 Q 50 71 56 57 Z" fill="#FF7B99"/>
+          <path d="M 50 59 L 50 66" stroke="#E65C7B" stroke-width="1.2" fill="none"/>
         </svg>
         <p>點擊抽取今日幸運小語</p>
         <span>✨ 輕觸卡片翻面 ✨</span>
