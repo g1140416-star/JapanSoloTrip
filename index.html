@@ -365,4 +365,192 @@
 
   <script>
     var currentRate = 0.215;
-    var isFli
+    var isFlipping = false;
+
+    var quotes = [
+      { text: "發現的真正旅程，不在於尋找新風景，而在於擁有新眼光。", author: "—— 馬塞爾·普魯斯特" },
+      { text: "世界不缺乏美，缺乏的是發現美的眼睛。", author: "—— 奧古斯特·羅丹" },
+      { text: "我們看到的不是事物的本質，而是我們自己的本質。", author: "—— 阿娜伊斯·寧" },
+      { text: "如果不曾迷失過，你就永遠無法發現新的大陸。", author: "—— 安德烈·紀德" },
+      { text: "地平線不過是我們視覺的極限，而非世界的邊界。", author: "—— 威廉·布萊克" },
+      { text: "最偉大的發現，往往隱藏在最不起眼的細節之中。", author: "—— 艾薩克·牛頓" },
+      { text: "當你改變看事物的方式，你所看的事物也會隨之改變。", author: "—— 韋恩·戴爾" },
+      { text: "世界是一本書，不旅行的人只讀了其中的一頁。", author: "—— 聖奧古斯丁" },
+      { text: "大自然從不著急，然而萬物皆隨之完成。", author: "—— 老子" },
+      { text: "時間是世界上最長又最短、最快又最慢的東西。", author: "—— 伏爾泰" },
+      { text: "生命就像騎自行車，想保持平衡，你就必須不斷前進。", author: "—— 阿爾伯特·愛因斯坦" },
+      { text: "一花一世界，一葉一菩提。", author: "—— 威廉·布萊克" },
+      { text: "沒有什麼是永恆的，這正是萬物如此珍貴的原因。", author: "—— 岡倉天心" },
+      { text: "春有百花秋有月，夏有涼風冬有雪；若無閒事掛心頭，便是人間好時節。", author: "—— 慧開禪師" },
+      { text: "生活要麼是一場大膽的冒險，要麼什麼都不是。", author: "—— 海倫·凱勒" },
+      { text: "最深的平靜，往往來自於接納現狀的那一刻。", author: "—— 馬可·奧理略" },
+      { text: "當你學會與自己和平共處，世界也會對你溫柔。", author: "—— 蒙田" },
+      { text: "一期一會。每一個瞬間都是不可複製的奇蹟。", author: "—— 千利休" },
+      { text: "慢慢來，比較快。給自己一點時間，世界會慢慢溫柔起來。", author: "—— 塞內卡" }
+    ];
+
+    function updateTripCounter() {
+      try {
+        var now = new Date();
+        var currentYear = now.getFullYear();
+        var startDate = new Date(currentYear, 9, 26);
+        var endDate = new Date(currentYear, 10, 12);
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var counterElem = document.getElementById('tripCounter');
+        if (!counterElem) return;
+
+        var diffTimeStart = startDate - today;
+        var diffDaysStart = Math.ceil(diffTimeStart / (1000 * 60 * 60 * 24));
+
+        if (diffDaysStart > 0) {
+          counterElem.textContent = '距離 10/26 出發還有 ' + diffDaysStart + ' 天 ✈️';
+        } else {
+          var dayOfTrip = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+          if (today <= endDate) {
+            counterElem.textContent = '日本旅程第 Day ' + dayOfTrip + ' 天 🍁';
+          } else {
+            counterElem.textContent = '旅程圓滿結束 🌸';
+          }
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function fetchExchangeRate() {
+      try {
+        fetch('https://open.er-api.com/v6/latest/JPY')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.rates && data.rates.TWD) {
+              currentRate = data.rates.TWD;
+              var rateElem = document.getElementById('rateText');
+              if (rateElem) rateElem.textContent = '即時匯率約 ' + currentRate.toFixed(4);
+            }
+          })
+          .catch(function(err) {
+            var rateElem = document.getElementById('rateText');
+            if (rateElem) rateElem.textContent = '參考匯率約 ' + currentRate;
+          });
+      } catch(e) { console.log(e); }
+    }
+
+    function convertCurrency(source) {
+      try {
+        var jpyInput = document.getElementById('jpyInput');
+        var twdInput = document.getElementById('twdInput');
+        if (!jpyInput || !twdInput) return;
+
+        if (source === 'jpy') {
+          var jpyVal = parseFloat(jpyInput.value);
+          if (!isNaN(jpyVal)) {
+            twdInput.value = Math.round(jpyVal * currentRate);
+          } else {
+            twdInput.value = '';
+          }
+        } else if (source === 'twd') {
+          var twdVal = parseFloat(twdInput.value);
+          if (!isNaN(twdVal)) {
+            jpyInput.value = Math.round(twdVal / currentRate);
+          } else {
+            jpyInput.value = '';
+          }
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function handleDraw() {
+      try {
+        var card = document.getElementById('quoteCard');
+        if (!card || isFlipping) return;
+
+        if (card.classList.contains('flipped')) {
+          isFlipping = true;
+          card.classList.remove('flipped');
+          setTimeout(function() {
+            showRandomQuote();
+            isFlipping = false;
+          }, 350);
+        } else {
+          showRandomQuote();
+          card.classList.add('flipped');
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function showRandomQuote() {
+      try {
+        var quoteText = document.getElementById('quoteText');
+        var quoteAuthor = document.getElementById('quoteAuthor');
+        var randomIndex = Math.floor(Math.random() * quotes.length);
+        var selected = quotes[randomIndex];
+        
+        if (quoteText && quoteAuthor) {
+          quoteText.textContent = selected.text;
+          quoteAuthor.textContent = selected.author;
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    var cityCoords = {
+      nagoya: { lat: 35.1815, lon: 136.9064, name: "名古屋" },
+      fukuoka: { lat: 33.5902, lon: 130.4017, name: "福岡" }
+    };
+
+    function fetchWeather() {
+      try {
+        var citySelect = document.getElementById('citySelect');
+        if (!citySelect) return;
+
+        var cityKey = citySelect.value;
+        var coords = cityCoords[cityKey];
+        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + coords.lat + '&longitude=' + coords.lon + '&current_weather=true';
+
+        var tempDisplay = document.getElementById('tempDisplay');
+        var outfitText = document.getElementById('outfitText');
+        var weatherIcon = document.getElementById('weatherIcon');
+
+        if (tempDisplay) tempDisplay.textContent = '讀取...';
+
+        fetch(url)
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            var temp = Math.round(data.current_weather.temperature);
+            var code = data.current_weather.weathercode;
+            
+            if (tempDisplay) tempDisplay.textContent = temp + '°C';
+            
+            var icon = '🌤️';
+            if (code === 0) icon = '☀️';
+            else if (code >= 1 && code <= 3) icon = '⛅';
+            else if (code >= 51) icon = '🌧️';
+
+            if (weatherIcon) weatherIcon.textContent = icon;
+
+            var outfit = '';
+            if (temp < 15) {
+              outfit = '天氣偏涼，建議穿厚外套或刷毛上衣，圍巾備著更保暖！';
+            } else if (temp >= 15 && temp <= 22) {
+              outfit = '舒爽涼意，推薦「薄長袖 + 風衣/針織外套」洋蔥式穿搭。';
+            } else {
+              outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便襯衫即可輕鬆出門！';
+            }
+
+            if (code >= 51) outfit += '（今天有雨，出門記得帶傘喔！）';
+
+            if (outfitText) outfitText.textContent = outfit;
+          })
+          .catch(function(err) {
+            if (tempDisplay) tempDisplay.textContent = '16°C';
+            if (weatherIcon) weatherIcon.textContent = '🍁';
+            if (outfitText) outfitText.textContent = '秋季早晚溫差大，建議「薄長袖 + 防風外套」洋蔥式搭法！';
+          });
+      } catch(e) { console.log(e); }
+    }
+
+    window.onload = function() {
+      updateTripCounter();
+      fetchWeather();
+      fetchExchangeRate();
+    };
+  </script>
+</body>
+</html>
