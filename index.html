@@ -7,10 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #FFFDF2; /* 奶油白底色 */
+      --bg-color: #FFFDF2;
       --card-bg: #FFFFFF;
-      --primary-yellow: #FFE066; /* 溫暖黃 */
-      --soft-yellow: #FFF2B2; /* 淺奶油黃 */
+      --primary-yellow: #FFE066;
+      --soft-yellow: #FFF2B2;
       --soft-pink: #FFD1DC;
       --accent-orange: #FF9B42;
       --text-color: #5A4A42;
@@ -53,7 +53,6 @@
       margin-bottom: 6px;
     }
 
-    /* 旅程日期計算機條籤 */
     .trip-counter-badge {
       display: inline-block;
       background: var(--soft-yellow);
@@ -66,7 +65,6 @@
       box-shadow: 0 2px 6px rgba(240, 220, 180, 0.4);
     }
 
-    /* 區塊通用卡片 */
     .section-card {
       width: 100%;
       max-width: 360px;
@@ -135,7 +133,6 @@
       gap: 4px;
     }
 
-    /* 💴 匯率計算器樣式 */
     .currency-header {
       font-size: 1.05rem;
       font-weight: 900;
@@ -178,11 +175,6 @@
       outline: none;
     }
 
-    .currency-input:focus {
-      border-color: var(--accent-orange);
-    }
-
-    /* 抽卡卡片 */
     .card-container {
       width: 100%;
       max-width: 360px;
@@ -331,4 +323,112 @@
     
     <div class="currency-input-group">
       <label for="jpyInput">日幣 ¥</label>
-      <input type="number" id="jpyInput" class="currency-input" placeholder="輸入日幣金額" oninput="
+      <input type="number" id="jpyInput" class="currency-input" placeholder="輸入日幣金額" oninput="convertCurrency('jpy')">
+    </div>
+    
+    <div class="currency-input-group">
+      <label for="twdInput">台幣 $</label>
+      <input type="number" id="twdInput" class="currency-input" placeholder="換算台幣金額" oninput="convertCurrency('twd')">
+    </div>
+  </div>
+
+  <!-- 抽卡卡片 -->
+  <div class="card-container" id="cardContainer" onclick="handleDraw()">
+    <div class="card" id="quoteCard">
+      <div class="card-face card-front">
+        <svg class="character-img" viewBox="0 0 100 100">
+          <circle cx="50" cy="55" r="32" fill="#FFE066"/>
+          <circle cx="28" cy="30" r="12" fill="#FFE066"/>
+          <circle cx="72" cy="30" r="12" fill="#FFE066"/>
+          <circle cx="28" cy="30" r="7" fill="#FFF2B2"/>
+          <circle cx="72" cy="30" r="7" fill="#FFF2B2"/>
+          <circle cx="40" cy="52" r="3.5" fill="#5A4A42"/>
+          <circle cx="60" cy="52" r="3.5" fill="#5A4A42"/>
+          <ellipse cx="50" cy="58" rx="4" ry="3" fill="#5A4A42"/>
+          <ellipse cx="33" cy="58" rx="5" ry="3" fill="#FFB7B2" opacity="0.7"/>
+          <ellipse cx="67" cy="58" rx="5" ry="3" fill="#FFB7B2" opacity="0.7"/>
+          <path d="M42 22 C35 15, 35 30, 42 26 Z" fill="#FFD1DC"/>
+          <path d="M58 22 C65 15, 65 30, 58 26 Z" fill="#FFD1DC"/>
+          <circle cx="50" cy="24" r="4" fill="#FF9B42"/>
+        </svg>
+        <p>點擊抽取今日幸運小語</p>
+        <span>✨ 輕觸卡片翻面 ✨</span>
+      </div>
+      <div class="card-face card-back">
+        <div class="quote-content" id="quoteText">點擊下方按鈕抽取第一張靈感卡片吧！</div>
+        <div class="quote-author" id="quoteAuthor">—— 今日靈感</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="action-btn" id="drawBtn" onclick="handleDraw()">再抽一張 🎲</button>
+
+  <script>
+    // 1. 計算旅程天數（自 10/26 開始）
+    function updateTripCounter() {
+      try {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const startDate = new Date(currentYear, 9, 26);
+        const endDate = new Date(currentYear, 10, 12);
+        
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const counterElem = document.getElementById('tripCounter');
+        if (!counterElem) return;
+
+        const diffTimeStart = startDate - today;
+        const diffDaysStart = Math.ceil(diffTimeStart / (1000 * 60 * 60 * 24));
+
+        if (diffDaysStart > 0) {
+          counterElem.textContent = `距離 10/26 出發還有 ${diffDaysStart} 天 ✈️`;
+        } else {
+          const dayOfTrip = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+          if (today <= endDate) {
+            counterElem.textContent = `日本旅程第 Day ${dayOfTrip} 天 🍁`;
+          } else {
+            counterElem.textContent = `旅程圓滿結束 🌸`;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 2. 匯率換算邏輯
+    let currentRate = 0.215;
+
+    function fetchExchangeRate() {
+      fetch('https://open.er-api.com/v6/latest/JPY')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.rates && data.rates.TWD) {
+            currentRate = data.rates.TWD;
+            const rateElem = document.getElementById('rateText');
+            if (rateElem) rateElem.textContent = `即時匯率約 ${currentRate.toFixed(4)}`;
+          }
+        })
+        .catch(err => {
+          const rateElem = document.getElementById('rateText');
+          if (rateElem) rateElem.textContent = `參考匯率約 ${currentRate}`;
+        });
+    }
+
+    function convertCurrency(source) {
+      const jpyInput = document.getElementById('jpyInput');
+      const twdInput = document.getElementById('twdInput');
+      if (!jpyInput || !twdInput) return;
+
+      if (source === 'jpy') {
+        const jpyVal = parseFloat(jpyInput.value);
+        if (!isNaN(jpyVal)) {
+          twdInput.value = Math.round(jpyVal * currentRate);
+        } else {
+          twdInput.value = '';
+        }
+      } else if (source === 'twd') {
+        const twdVal = parseFloat(twdInput.value);
+        if (!isNaN(twdVal)) {
+          jpyInput.value = Math.round(twdVal / currentRate);
+        } else {
+          jpyInput.value = '';
+        }
