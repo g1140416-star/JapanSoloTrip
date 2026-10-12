@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>日本隨行小卡 - 隨行靈感與天氣</title>
+  <title>日本隨行小卡</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -364,71 +364,5 @@
   <button class="action-btn" id="drawBtn" onclick="handleDraw()">再抽一張 🎲</button>
 
   <script>
-    // 1. 計算旅程天數（自 10/26 開始）
-    function updateTripCounter() {
-      try {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const startDate = new Date(currentYear, 9, 26);
-        const endDate = new Date(currentYear, 10, 12);
-        
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const counterElem = document.getElementById('tripCounter');
-        if (!counterElem) return;
-
-        const diffTimeStart = startDate - today;
-        const diffDaysStart = Math.ceil(diffTimeStart / (1000 * 60 * 60 * 24));
-
-        if (diffDaysStart > 0) {
-          counterElem.textContent = `距離 10/26 出發還有 ${diffDaysStart} 天 ✈️`;
-        } else {
-          const dayOfTrip = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-          if (today <= endDate) {
-            counterElem.textContent = `日本旅程第 Day ${dayOfTrip} 天 🍁`;
-          } else {
-            counterElem.textContent = `旅程圓滿結束 🌸`;
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    // 2. 匯率換算邏輯
-    let currentRate = 0.215;
-
-    function fetchExchangeRate() {
-      fetch('https://open.er-api.com/v6/latest/JPY')
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.rates && data.rates.TWD) {
-            currentRate = data.rates.TWD;
-            const rateElem = document.getElementById('rateText');
-            if (rateElem) rateElem.textContent = `即時匯率約 ${currentRate.toFixed(4)}`;
-          }
-        })
-        .catch(err => {
-          const rateElem = document.getElementById('rateText');
-          if (rateElem) rateElem.textContent = `參考匯率約 ${currentRate}`;
-        });
-    }
-
-    function convertCurrency(source) {
-      const jpyInput = document.getElementById('jpyInput');
-      const twdInput = document.getElementById('twdInput');
-      if (!jpyInput || !twdInput) return;
-
-      if (source === 'jpy') {
-        const jpyVal = parseFloat(jpyInput.value);
-        if (!isNaN(jpyVal)) {
-          twdInput.value = Math.round(jpyVal * currentRate);
-        } else {
-          twdInput.value = '';
-        }
-      } else if (source === 'twd') {
-        const twdVal = parseFloat(twdInput.value);
-        if (!isNaN(twdVal)) {
-          jpyInput.value = Math.round(twdVal / currentRate);
-        } else {
-          jpyInput.value = '';
-        }
+    var currentRate = 0.215;
+    var isFli
