@@ -210,6 +210,33 @@
       margin-bottom: 10px;
     }
 
+    /* 日期切換頁籤 */
+    .day-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .day-tab {
+      flex: 1;
+      padding: 6px 0;
+      background: var(--bg-color);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      color: var(--light-text);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .day-tab.active {
+      background: var(--primary-yellow);
+      color: var(--text-color);
+      border-color: var(--accent-orange);
+    }
+
     .weather-row {
       display: flex;
       align-items: center;
@@ -222,6 +249,7 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
+      min-width: 90px;
     }
 
     .weather-icon-temp {
@@ -235,7 +263,7 @@
     }
 
     .temp-display {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 900;
       color: var(--accent-orange);
     }
@@ -494,12 +522,19 @@
     </div>
   </div>
 
-  <!-- 天氣與穿衣提醒 -->
+  <!-- 天氣與穿衣提醒（含金明後三天預報切換） -->
   <div class="section-card">
     <select class="city-select" id="citySelect" onchange="fetchWeather()">
-      <option value="nagoya">🏯 名古屋 (Nagoya) 即時天氣</option>
-      <option value="fukuoka">🍜 福岡 (Fukuoka) 即時天氣</option>
+      <option value="nagoya">🏯 名古屋 (Nagoya) 天氣預報</option>
+      <option value="fukuoka">🍜 福岡 (Fukuoka) 天氣預報</option>
     </select>
+
+    <!-- 三天預報頁籤 -->
+    <div class="day-tabs">
+      <button class="day-tab active" id="tab0" onclick="switchDay(0)">今天</button>
+      <button class="day-tab" id="tab1" onclick="switchDay(1)">明天</button>
+      <button class="day-tab" id="tab2" onclick="switchDay(2)">後天</button>
+    </div>
     
     <div class="weather-row">
       <div class="weather-main">
@@ -592,6 +627,8 @@
   <script>
     var currentRate = 0.215;
     var isFlipping = false;
+    var weatherDataCache = null;
+    var selectedDayIndex = 0;
 
     function toggleDrawer(open) {
       var overlay = document.getElementById('drawerOverlay');
@@ -748,12 +785,10 @@
 
         var cityKey = citySelect.value;
         var coords = cityCoords[cityKey];
-        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + coords.lat + '&longitude=' + coords.lon + '&current_weather=true&hourly=precipitation_probability&daily=precipitation_probability_max&timezone=Asia%2FTokyo';
+        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + coords.lat + '&longitude=' + coords.lon + '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo';
 
         var tempDisplay = document.getElementById('tempDisplay');
         var popDisplay = document.getElementById('popDisplay');
-        var outfitText = document.getElementById('outfitText');
-        var weatherIcon = document.getElementById('weatherIcon');
 
         if (tempDisplay) tempDisplay.textContent = '讀取...';
         if (popDisplay) popDisplay.textContent = '☔ 降雨率 --%';
@@ -761,51 +796,74 @@
         fetch(url)
           .then(function(res) { return res.json(); })
           .then(function(data) {
-            var temp = Math.round(data.current_weather.temperature);
-            var code = data.current_weather.weathercode;
-            
-            // 抓取降雨機率（優先取當天最大值，若無則抓當前小時值）
-            var pop = 0;
-            if (data.daily && data.daily.precipitation_probability_max && data.daily.precipitation_probability_max.length > 0) {
-              pop = data.daily.precipitation_probability_max[0];
-            } else if (data.hourly && data.hourly.precipitation_probability && data.hourly.precipitation_probability.length > 0) {
-              pop = data.hourly.precipitation_probability[0];
-            }
-
-            if (tempDisplay) tempDisplay.textContent = temp + '°C';
-            if (popDisplay) popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
-            
-            var icon = '🌤️';
-            if (code === 0) icon = '☀️';
-            else if (code >= 1 && code <= 3) icon = '⛅';
-            else if (code >= 51) icon = '🌧️';
-
-            if (weatherIcon) weatherIcon.textContent = icon;
-
-            var outfit = '';
-            if (temp < 15) {
-              outfit = '天氣偏涼，建議穿厚外套或刷毛上衣，圍巾備著更保暖！';
-            } else if (temp >= 15 && temp <= 22) {
-              outfit = '舒爽涼意，推薦「薄長袖 + 風衣/針織外套」洋蔥式穿搭。';
-            } else {
-              outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便襯衫即可輕鬆出門！';
-            }
-
-            // 根據降雨機率動態提示
-            if (pop >= 50 || code >= 51) {
-              outfit += '（今天降雨機率較高，出門記得帶傘喔！）';
-            } else if (pop >= 30) {
-              outfit += '（有些微降雨可能，建議帶把摺疊傘備用。）';
-            }
-
-            if (outfitText) outfitText.textContent = outfit;
+            weatherDataCache = data.daily;
+            renderWeather(selectedDayIndex);
           })
           .catch(function(err) {
-            if (tempDisplay) tempDisplay.textContent = '16°C';
+            if (tempDisplay) tempDisplay.textContent = '12~19°C';
             if (popDisplay) popDisplay.textContent = '☔ 降雨率 20%';
             if (weatherIcon) weatherIcon.textContent = '🍁';
             if (outfitText) outfitText.textContent = '秋季早晚溫差大，建議「薄長袖 + 防風外套」洋蔥式搭法！';
           });
+      } catch(e) { console.log(e); }
+    }
+
+    function switchDay(index) {
+      selectedDayIndex = index;
+      for (var i = 0; i < 3; i++) {
+        var tab = document.getElementById('tab' + i);
+        if (tab) {
+          if (i === index) tab.classList.add('active');
+          else tab.classList.remove('active');
+        }
+      }
+      if (weatherDataCache) {
+        renderWeather(index);
+      }
+    }
+
+    function renderWeather(index) {
+      try {
+        if (!weatherDataCache) return;
+
+        var tempMax = Math.round(weatherDataCache.temperature_2m_max[index]);
+        var tempMin = Math.round(weatherDataCache.temperature_2m_min[index]);
+        var code = weatherDataCache.weathercode[index];
+        var pop = weatherDataCache.precipitation_probability_max[index] || 0;
+
+        var tempDisplay = document.getElementById('tempDisplay');
+        var popDisplay = document.getElementById('popDisplay');
+        var outfitText = document.getElementById('outfitText');
+        var weatherIcon = document.getElementById('weatherIcon');
+
+        if (tempDisplay) tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
+        if (popDisplay) popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
+
+        var icon = '🌤️';
+        if (code === 0) icon = '☀️';
+        else if (code >= 1 && code <= 3) icon = '⛅';
+        else if (code >= 51) icon = '🌧️';
+
+        if (weatherIcon) weatherIcon.textContent = icon;
+
+        var avgTemp = (tempMax + tempMin) / 2;
+        var outfit = '';
+
+        if (avgTemp < 15) {
+          outfit = '氣溫偏涼，建議穿厚外套或刷毛上衣，溫差大記得帶保暖配件！';
+        } else if (avgTemp >= 15 && avgTemp <= 22) {
+          outfit = '舒爽涼意，推薦「薄長袖 + 風衣/針織外套」洋蔥式靈活穿搭。';
+        } else {
+          outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便外衣即可輕鬆出門！';
+        }
+
+        if (pop >= 50 || code >= 51) {
+          outfit += '（當天降雨機率高，出門記得帶傘喔！）';
+        } else if (pop >= 30) {
+          outfit += '（有些微降雨可能，建議隨身攜帶摺疊傘。）';
+        }
+
+        if (outfitText) outfitText.textContent = outfit;
       } catch(e) { console.log(e); }
     }
 
