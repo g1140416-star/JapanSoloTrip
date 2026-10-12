@@ -551,7 +551,7 @@
 <body>
 
   <header>
-    <button class="menu-btn" onclick="toggleDrawer(true)">☰ 救急包</button>
+    <button class="menu-btn" onclick="toggleDrawer(true)">☰ 更多資訊</button>
     <h1>✨ 日本隨行小卡 ✨</h1>
     <div class="trip-counter-badge" id="tripCounter">計算旅程天數中...</div>
   </header>
@@ -562,7 +562,7 @@
   <!-- 側邊抽屜內容 -->
   <div class="drawer-menu" id="drawerMenu">
     <div class="drawer-header">
-      <h2 id="drawerTitle">🧰 隨行救急包</h2>
+      <h2 id="drawerTitle">ℹ️ 更多資訊</h2>
       <button class="close-btn" onclick="toggleDrawer(false)">✕</button>
     </div>
 
@@ -752,7 +752,7 @@
 
       if (pageName === 'main') {
         mainPage.style.display = 'block';
-        title.textContent = '🧰 隨行救急包';
+        title.textContent = 'ℹ️ 更多資訊';
       } else if (pageName === 'emergency') {
         emergencyPage.style.display = 'block';
         title.textContent = '🆘 緊急求助電話';
