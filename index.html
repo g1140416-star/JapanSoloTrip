@@ -585,4 +585,331 @@
           <ellipse cx="63" cy="40" rx="4" ry="4.5" fill="#111112"/>
           <circle cx="35.5" cy="38.5" r="1.6" fill="#FFFFFF"/>
           <circle cx="61.5" cy="38.5" r="1.6" fill="#FFFFFF"/>
-          <path d="M 44 48 L 5
+          <path d="M 44 48 L 56 48 C 58 48, 57 53, 50 54 C 43 53, 42 48, 44 48 Z" fill="#0E0E10"/>
+          <ellipse cx="48" cy="49" rx="1.2" ry="0.6" fill="#808080"/>
+          <path d="M 41 56 Q 50 59 59 56" stroke="#1C1C1E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 44 57 Q 50 71 56 57 Z" fill="#FF7B99"/>
+          <path d="M 50 59 L 50 66" stroke="#E65C7B" stroke-width="1.2" fill="none"/>
+        </svg>
+        <p>點擊抽取今日幸運小語</p>
+        <span>✨ 輕觸卡片翻面 ✨</span>
+      </div>
+      <div class="card-face card-back">
+        <div class="quote-content" id="quoteText">點擊下方按鈕抽取第一張靈感卡片吧！</div>
+        <div class="quote-author" id="quoteAuthor">—— 今日靈感</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="action-btn" id="drawBtn" onclick="handleDraw()">再抽一張 🎲</button>
+
+  <script>
+    var currentRate = 0.215;
+    var isFlipping = false;
+    var weatherDataCache = null;
+    var selectedDayIndex = 0;
+
+    var cityJmaCodes = {
+      nagoya: "230000",
+      fukuoka: "400000"
+    };
+
+    function toggleDrawer(open) {
+      var overlay = document.getElementById('drawerOverlay');
+      var menu = document.getElementById('drawerMenu');
+      if (open) {
+        overlay.classList.add('active');
+        menu.classList.add('active');
+      } else {
+        overlay.classList.remove('active');
+        menu.classList.remove('active');
+      }
+    }
+
+    var quotes = [
+      { text: "發現的真正旅程，不在於尋找新風景，而在於擁有新眼光。", author: "—— 馬塞爾·普魯斯特" },
+      { text: "世界不缺乏美，缺乏的是發現美的眼睛。", author: "—— 奧古斯特·羅丹" },
+      { text: "我們看到的不是事物的本質，而是我們自己的本質。", author: "—— 阿娜伊斯·寧" },
+      { text: "如果不曾迷失過，你就永遠無法發現新的大陸。", author: "—— 安德烈·紀德" },
+      { text: "地平線不過是我們視覺的極限，而非世界的邊界。", author: "—— 威廉·布萊克" },
+      { text: "最偉大的發現，往往隱藏在最不起眼的細節之中。", author: "—— 艾薩克·牛頓" },
+      { text: "當你改變看事物的方式，你所看的事物也會隨之改變。", author: "—— 韋恩·戴爾" },
+      { text: "世界是一本書，不旅行的人只讀了其中的一頁。", author: "—— 聖奧古斯丁" },
+      { text: "大自然從不著急，然而萬物皆隨之完成。", author: "—— 老子" },
+      { text: "時間是世界上最長又最短、最快又最慢的東西。", author: "—— 伏爾泰" },
+      { text: "生命就像騎自行車，想保持平衡，你就必須不斷前進。", author: "—— 阿爾伯特·愛因斯坦" },
+      { text: "一花一世界，一葉一菩提。", author: "—— 威廉·布萊克" },
+      { text: "沒有什麼是永恆的，這正是萬物如此珍貴的原因。", author: "—— 岡倉天心" },
+      { text: "春有百花秋有月，夏有涼風冬有雪；若無閒事掛心頭，便是人間好時節。", author: "—— 慧開禪師" },
+      { text: "生活要麼是一場大膽的冒險，要麼什麼都不是。", author: "—— 海倫·凱勒" },
+      { text: "最深的平靜，往往來自於接納現狀的那一刻。", author: "—— 馬可·奧理略" },
+      { text: "當你學會與自己和平共處，世界也會對你溫柔。", author: "—— 蒙田" },
+      { text: "一期一會。每一個瞬間都是不可複製的奇蹟。", author: "—— 千利休" },
+      { text: "慢慢來，比較快。給自己一點時間，世界會慢慢溫柔起來。", author: "—— 塞內卡" }
+    ];
+
+    function updateTripCounter() {
+      try {
+        var now = new Date();
+        var currentYear = now.getFullYear();
+        var startDate = new Date(currentYear, 9, 26);
+        var endDate = new Date(currentYear, 10, 12);
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var counterElem = document.getElementById('tripCounter');
+        if (!counterElem) return;
+
+        var diffTimeStart = startDate - today;
+        var diffDaysStart = Math.ceil(diffTimeStart / (1000 * 60 * 60 * 24));
+
+        if (diffDaysStart > 0) {
+          counterElem.textContent = '距離 10/26 出發還有 ' + diffDaysStart + ' 天 ✈️';
+        } else {
+          var dayOfTrip = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+          if (today <= endDate) {
+            counterElem.textContent = '日本旅程第 Day ' + dayOfTrip + ' 天 🍁';
+          } else {
+            counterElem.textContent = '旅程圓滿結束 🌸';
+          }
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function fetchExchangeRate() {
+      try {
+        fetch('https://open.er-api.com/v6/latest/JPY')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.rates && data.rates.TWD) {
+              currentRate = parseFloat(data.rates.TWD.toFixed(4));
+              var rateInput = document.getElementById('customRateInput');
+              if (rateInput) rateInput.value = currentRate;
+            }
+          })
+          .catch(function(err) { console.log(err); });
+      } catch(e) { console.log(e); }
+    }
+
+    function updateCustomRate() {
+      var rateInput = document.getElementById('customRateInput');
+      if (rateInput) {
+        var val = parseFloat(rateInput.value);
+        if (!isNaN(val) && val > 0) {
+          currentRate = val;
+          convertCurrency('jpy');
+        }
+      }
+    }
+
+    function convertCurrency(source) {
+      try {
+        var jpyInput = document.getElementById('jpyInput');
+        var twdInput = document.getElementById('twdInput');
+        if (!jpyInput || !twdInput) return;
+
+        if (source === 'jpy') {
+          var jpyVal = parseFloat(jpyInput.value);
+          if (!isNaN(jpyVal)) {
+            twdInput.value = Math.round(jpyVal * currentRate);
+          } else {
+            twdInput.value = '';
+          }
+        } else if (source === 'twd') {
+          var twdVal = parseFloat(twdInput.value);
+          if (!isNaN(twdVal)) {
+            jpyInput.value = Math.round(twdVal / currentRate);
+          } else {
+            jpyInput.value = '';
+          }
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function handleDraw() {
+      try {
+        var card = document.getElementById('quoteCard');
+        if (!card || isFlipping) return;
+
+        if (card.classList.contains('flipped')) {
+          isFlipping = true;
+          card.classList.remove('flipped');
+          setTimeout(function() {
+            showRandomQuote();
+            isFlipping = false;
+          }, 350);
+        } else {
+          showRandomQuote();
+          card.classList.add('flipped');
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function showRandomQuote() {
+      try {
+        var quoteText = document.getElementById('quoteText');
+        var quoteAuthor = document.getElementById('quoteAuthor');
+        var randomIndex = Math.floor(Math.random() * quotes.length);
+        var selected = quotes[randomIndex];
+        
+        if (quoteText && quoteAuthor) {
+          quoteText.textContent = selected.text;
+          quoteAuthor.textContent = selected.author;
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    // 透過代理請求日本氣象廳 JMA 官方資料 (避開 CORS 阻擋)
+    function fetchWeather() {
+      try {
+        var citySelect = document.getElementById('citySelect');
+        if (!citySelect) return;
+
+        var cityKey = citySelect.value;
+        var code = cityJmaCodes[cityKey];
+        var jmaUrl = 'https://www.jma.go.jp/bosai/forecast/data/forecast/' + code + '.json';
+        var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(jmaUrl);
+
+        var tempDisplay = document.getElementById('tempDisplay');
+        var popDisplay = document.getElementById('popDisplay');
+
+        if (tempDisplay) tempDisplay.textContent = '讀取...';
+        if (popDisplay) popDisplay.textContent = '☔ 降雨率 --%';
+
+        fetch(proxyUrl)
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            var rawData = JSON.parse(data.contents);
+            weatherDataCache = parseJmaData(rawData);
+            renderWeather(selectedDayIndex);
+          })
+          .catch(function(err) {
+            console.log(err);
+            if (tempDisplay) tempDisplay.textContent = '18~28°C';
+            if (popDisplay) popDisplay.textContent = '☔ 降雨率 30%';
+          });
+      } catch(e) { console.log(e); }
+    }
+
+    function parseJmaData(data) {
+      var result = [
+        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" },
+        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" },
+        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" }
+      ];
+
+      try {
+        var timeSeries = data[0].timeSeries;
+        
+        if (timeSeries[0] && timeSeries[0].areas[0].weathers) {
+          var weathers = timeSeries[0].areas[0].weathers;
+          for (var i = 0; i < Math.min(weathers.length, 3); i++) {
+            result[i].weatherName = weathers[i];
+          }
+        }
+
+        if (timeSeries[1] && timeSeries[1].areas[0].pops) {
+          var pops = timeSeries[1].areas[0].pops;
+          var todayPops = pops.slice(0, 4).map(Number).filter(function(n){ return !isNaN(n); });
+          result[0].pop = todayPops.length > 0 ? Math.max.apply(null, todayPops) : 0;
+          
+          var tomorrowPops = pops.slice(4, 8).map(Number).filter(function(n){ return !isNaN(n); });
+          result[1].pop = tomorrowPops.length > 0 ? Math.max.apply(null, tomorrowPops) : 0;
+        }
+
+        if (timeSeries[2] && timeSeries[2].areas[0].temps) {
+          var temps = timeSeries[2].areas[0].temps;
+          if (temps.length >= 2) {
+            result[0].tempMin = temps[0];
+            result[0].tempMax = temps[1];
+          }
+          if (temps.length >= 4) {
+            result[1].tempMin = temps[2];
+            result[1].tempMax = temps[3];
+          }
+        }
+
+        if (data[1] && data[1].tempAverage) {
+          var minAvg = data[1].tempAverage.min;
+          var maxAvg = data[1].tempAverage.max;
+          if (minAvg) result[2].tempMin = Math.round(minAvg.value || minAvg);
+          if (maxAvg) result[2].tempMax = Math.round(maxAvg.value || maxAvg);
+        }
+      } catch(e) { console.log(e); }
+
+      return result;
+    }
+
+    function switchDay(index) {
+      selectedDayIndex = index;
+      for (var i = 0; i < 3; i++) {
+        var tab = document.getElementById('tab' + i);
+        if (tab) {
+          if (i === index) tab.classList.add('active');
+          else tab.classList.remove('active');
+        }
+      }
+      if (weatherDataCache) {
+        renderWeather(index);
+      }
+    }
+
+    function renderWeather(index) {
+      try {
+        if (!weatherDataCache || !weatherDataCache[index]) return;
+
+        var dayData = weatherDataCache[index];
+        var tempMin = dayData.tempMin;
+        var tempMax = dayData.tempMax;
+        var pop = dayData.pop;
+        var wText = dayData.weatherName || "";
+
+        var tempDisplay = document.getElementById('tempDisplay');
+        var popDisplay = document.getElementById('popDisplay');
+        var outfitText = document.getElementById('outfitText');
+        var weatherIcon = document.getElementById('weatherIcon');
+
+        if (tempMin !== "--" && tempMax !== "--") {
+          tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
+        } else if (tempMax !== "--") {
+          tempDisplay.textContent = tempMax + '°C';
+        } else {
+          tempDisplay.textContent = '22°C';
+        }
+
+        popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
+
+        var icon = '🌤️';
+        if (wText.indexOf('雨') !== -1) icon = '🌧️';
+        else if (wText.indexOf('晴') !== -1) icon = '☀️';
+        else if (wText.indexOf('雲') !== -1 || wText.indexOf('曇') !== -1) icon = '⛅';
+
+        weatherIcon.textContent = icon;
+
+        var t = parseInt(tempMax) || 22;
+        var outfit = '';
+
+        if (t < 16) {
+          outfit = '氣溫偏涼，建議穿厚外套或刷毛上衣，圍巾備著更保暖！';
+        } else if (t >= 16 && t <= 23) {
+          outfit = '舒爽涼意，推薦「薄長袖 + 風衣/針織外套」洋蔥式穿搭。';
+        } else {
+          outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便襯衫即可輕鬆出門！';
+        }
+
+        if (pop >= 40 || wText.indexOf('雨') !== -1) {
+          outfit += '（日本氣象廳預報當天降雨機率高，記得帶傘喔！）';
+        } else if (pop >= 20) {
+          outfit += '（有些微降雨可能，建議帶把摺疊傘備用。）';
+        }
+
+        outfitText.textContent = outfit;
+      } catch(e) { console.log(e); }
+    }
+
+    window.onload = function() {
+      updateTripCounter();
+      fetchWeather();
+      fetchExchangeRate();
+    };
+  </script>
+</body>
+</html>
