@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Japan Trip - 隨行靈感抽卡與天氣</title>
+  <title>日本隨行小卡 - 隨行靈感與天氣</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -46,23 +46,24 @@
       max-width: 360px;
     }
 
-    .header-badge {
+    header h1 {
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+
+    /* 旅程日期計算機條籤 */
+    .trip-counter-badge {
       display: inline-block;
       background: var(--soft-yellow);
       color: var(--accent-orange);
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 14px;
-      margin-bottom: 6px;
+      padding: 5px 16px;
+      border-radius: 16px;
       border: 1.5px solid var(--border-color);
       box-shadow: 0 2px 6px rgba(240, 220, 180, 0.4);
-    }
-
-    header h1 {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: var(--text-color);
     }
 
     /* 天氣卡片 */
@@ -218,91 +219,4 @@
       color: var(--accent-orange);
       font-weight: 900;
       background: var(--soft-yellow);
-      padding: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .action-btn {
-      width: 100%;
-      max-width: 360px;
-      background: linear-gradient(135deg, var(--primary-yellow) 0%, #FFD000 100%);
-      color: var(--text-color);
-      border: 2.5px solid var(--border-color);
-      padding: 12px;
-      border-radius: 20px;
-      font-size: 0.95rem;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(255, 210, 0, 0.3);
-      transition: transform 0.15s;
-    }
-
-    .action-btn:active {
-      transform: scale(0.96);
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(2deg); }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="header-badge">💛 每日隨行靈感 💛</div>
-    <h1>✨ 日本隨行卡 ✨</h1>
-  </header>
-
-  <!-- 天氣與穿衣提醒 -->
-  <div class="weather-section">
-    <select class="city-select" id="citySelect" onchange="fetchWeather()">
-      <option value="nagoya">🏯 名古屋 (Nagoya) 即時天氣</option>
-      <option value="fukuoka">🍜 福岡 (Fukuoka) 即時天氣</option>
-    </select>
-    
-    <div class="weather-row">
-      <div class="weather-main">
-        <div class="weather-icon" id="weatherIcon">🌤️</div>
-        <div class="temp-display" id="tempDisplay">--°C</div>
-      </div>
-      
-      <div class="outfit-box">
-        <div class="outfit-title"><span>👔</span> 穿搭提醒</div>
-        <div id="outfitText">連線查詢最新天氣與穿搭建議...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 抽卡卡片 -->
-  <div class="card-container" id="cardContainer">
-    <div class="card" id="quoteCard">
-      <div class="card-face card-front">
-        <svg class="character-img" viewBox="0 0 100 100">
-          <circle cx="50" cy="55" r="32" fill="#FFE066"/>
-          <circle cx="28" cy="30" r="12" fill="#FFE066"/>
-          <circle cx="72" cy="30" r="12" fill="#FFE066"/>
-          <circle cx="28" cy="30" r="7" fill="#FFF2B2"/>
-          <circle cx="72" cy="30" r="7" fill="#FFF2B2"/>
-          <circle cx="40" cy="52" r="3.5" fill="#5A4A42"/>
-          <circle cx="60" cy="52" r="3.5" fill="#5A4A42"/>
-          <ellipse cx="50" cy="58" rx="4" ry="3" fill="#5A4A42"/>
-          <ellipse cx="33" cy="58" rx="5" ry="3" fill="#FFB7B2" opacity="0.7"/>
-          <ellipse cx="67" cy="58" rx="5" ry="3" fill="#FFB7B2" opacity="0.7"/>
-          <path d="M42 22 C35 15, 35 30, 42 26 Z" fill="#FFD1DC"/>
-          <path d="M58 22 C65 15, 65 30, 58 26 Z" fill="#FFD1DC"/>
-          <circle cx="50" cy="24" r="4" fill="#FF9B42"/>
-        </svg>
-        <p>點擊抽取今日幸運小語</p>
-        <span>✨ 輕觸卡片翻面 ✨</span>
-      </div>
-      <div class="card-face card-back">
-        <div class="quote-content" id="quoteText">點擊下方按鈕抽取第一張靈感卡片吧！</div>
-        <div class="quote-author" id="quoteAuthor">—— 今日靈感</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="action-btn" id="drawBtn">再抽一張 🎲</button>
-
-  <script>
+      padding:
