@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Japan Trip - 隨行小語與天氣指南</title>
+  <title>Japan Trip - 隨行靈感抽卡與天氣</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #FFFDF2;
+      --bg-color: #FFFDF2; /* 奶油白底色 */
       --card-bg: #FFFFFF;
-      --primary-yellow: #FFE066;
+      --primary-yellow: #FFE066; /* 溫暖黃 */
+      --soft-yellow: #FFF2B2; /* 淺奶油黃 */
       --soft-pink: #FFD1DC;
-      --soft-yellow: #FFF2B2;
       --accent-orange: #FF9B42;
       --text-color: #5A4A42;
       --light-text: #9E8E85;
@@ -48,14 +48,15 @@
 
     .header-badge {
       display: inline-block;
-      background: var(--soft-pink);
-      color: #D85A75;
-      font-size: 0.75rem;
+      background: var(--soft-yellow);
+      color: var(--accent-orange);
+      font-size: 0.78rem;
       font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 12px;
+      padding: 4px 14px;
+      border-radius: 14px;
       margin-bottom: 6px;
-      box-shadow: 0 2px 6px rgba(255, 209, 220, 0.6);
+      border: 1.5px solid var(--border-color);
+      box-shadow: 0 2px 6px rgba(240, 220, 180, 0.4);
     }
 
     header h1 {
@@ -64,7 +65,7 @@
       color: var(--text-color);
     }
 
-    /* 天氣區塊卡片 */
+    /* 天氣卡片 */
     .weather-section {
       width: 100%;
       max-width: 360px;
@@ -133,7 +134,7 @@
       gap: 4px;
     }
 
-    /* 抽卡區塊 */
+    /* 抽卡卡片 */
     .card-container {
       width: 100%;
       max-width: 360px;
@@ -205,7 +206,7 @@
     }
 
     .quote-content {
-      font-size: 1rem;
+      font-size: 0.98rem;
       line-height: 1.65;
       color: var(--text-color);
       margin: auto 0;
@@ -249,15 +250,15 @@
 <body>
 
   <header>
-    <div class="header-badge">🎀 Sanrio Style Companion 🎀</div>
-    <h1>✨ 日本隨行抽卡小助手 ✨</h1>
+    <div class="header-badge">💛 每日隨行靈感 💛</div>
+    <h1>✨ 日本隨行卡 ✨</h1>
   </header>
 
-  <!-- 即時天氣與穿衣提醒卡片 -->
+  <!-- 天氣與穿衣提醒 -->
   <div class="weather-section">
     <select class="city-select" id="citySelect" onchange="fetchWeather()">
-      <option value="nagoya">🏯 名古屋 (Nagoya) 即時天氣</option>
-      <option value="fukuoka">🍜 福岡 (Fukuoka) 即時天氣</option>
+      <option value="nagoya">🏯 名古屋 (Nagoya) 當天天氣</option>
+      <option value="fukuoka">🍜 福岡 (Fukuoka) 當天天氣</option>
     </select>
     
     <div class="weather-row">
@@ -267,13 +268,13 @@
       </div>
       
       <div class="outfit-box">
-        <div class="outfit-title"><span>👔</span> 今日穿搭提醒</div>
-        <div id="outfitText">正在查詢當地最新天氣與穿搭建議...</div>
+        <div class="outfit-title"><span>👔</span> 穿搭提醒</div>
+        <div id="outfitText">連線查詢最新天氣與穿搭建議...</div>
       </div>
     </div>
   </div>
 
-  <!-- 每日抽卡卡片 -->
+  <!-- 抽卡卡片 -->
   <div class="card-container" id="cardContainer">
     <div class="card" id="quoteCard">
       <div class="card-face card-front">
@@ -281,8 +282,8 @@
           <circle cx="50" cy="55" r="32" fill="#FFE066"/>
           <circle cx="28" cy="30" r="12" fill="#FFE066"/>
           <circle cx="72" cy="30" r="12" fill="#FFE066"/>
-          <circle cx="28" cy="30" r="7" fill="#FFD1DC"/>
-          <circle cx="72" cy="30" r="7" fill="#FFD1DC"/>
+          <circle cx="28" cy="30" r="7" fill="#FFF2B2"/>
+          <circle cx="72" cy="30" r="7" fill="#FFF2B2"/>
           <circle cx="40" cy="52" r="3.5" fill="#5A4A42"/>
           <circle cx="60" cy="52" r="3.5" fill="#5A4A42"/>
           <ellipse cx="50" cy="58" rx="4" ry="3" fill="#5A4A42"/>
@@ -290,13 +291,13 @@
           <ellipse cx="67" cy="58" rx="5" ry="3" fill="#FFB7B2" opacity="0.7"/>
           <path d="M42 22 C35 15, 35 30, 42 26 Z" fill="#FFD1DC"/>
           <path d="M58 22 C65 15, 65 30, 58 26 Z" fill="#FFD1DC"/>
-          <circle cx="50" cy="24" r="4" fill="#FF85A1"/>
+          <circle cx="50" cy="24" r="4" fill="#FF9B42"/>
         </svg>
         <p>點擊抽取今日幸運小語</p>
         <span>✨ 輕觸卡片翻面 ✨</span>
       </div>
       <div class="card-face card-back">
-        <div class="quote-content" id="quoteText">點擊下方按鈕抽取第一張卡片吧！</div>
+        <div class="quote-content" id="quoteText">點擊下方按鈕抽取第一張靈感卡片吧！</div>
         <div class="quote-author" id="quoteAuthor">—— 今日靈感</div>
       </div>
     </div>
@@ -355,7 +356,57 @@
       { text: "萬物皆有裂痕，那是光照進來的地方。", author: "—— 柯恩" },
       { text: "在極深的寒冬裡，我終於學會在自己的內心深處，打造一個不可戰勝的夏天。", author: "—— 加繆" },
       { text: "愛是唯一能跨越時間、空間與生死界限的力量。", author: "—— 愛因斯坦" },
-      { text: "慢慢來，比較快。給自己一點時間，世界會慢慢溫柔起來。", author: "—— 塞內卡" }
+      { text: "慢慢來，比較快。給自己一點時間，世界會慢慢溫柔起來。", author: "—— 塞內卡" },
+      { text: "衡量生命的尺度是它的精彩程度，而非長短。", author: "—— 塞內卡" },
+      { text: "未經審視的人生，是不值得過的人生。", author: "—— 蘇格拉底" },
+      { text: "幸福屬於那些容易感到滿足的人。", author: "—— 亞里斯多德" },
+      { text: "最重要的不是活着，而是好好地活着。", author: "—— 柏拉圖" },
+      { text: "平靜來自於內心，切勿向外求索。", author: "—— 釋迦牟尼" },
+      { text: "行千里路，勝讀萬卷書。", author: "—— 顧炎武" },
+      { text: "吾生也有涯，而知也無涯。", author: "—— 莊子" },
+      { text: "非淡泊無以明志，非寧靜無以致遠。", author: "—— 諸葛亮" },
+      { text: "人生的精彩，在於每一次重新站起來的勇氣。", author: "—— 曼德拉" },
+      { text: "堅持做你自己，因為其他人已經有人做了。", author: "—— 奧斯卡·王爾德" },
+      { text: "你的時間有限，所以不要浪費時間活在別人的生活裡。", author: "—— 史蒂夫·賈伯斯" },
+      { text: "卓越不是一種行為，而是一種習慣。", author: "—— 亞里斯多德" },
+      { text: "凡是過往，皆為序章。", author: "—— 莎士比亞" },
+      { text: "希望是覺醒者的夢想。", author: "—— 亞里斯多德" },
+      { text: "心有多大，舞台就有多大。", author: "—— 歌德" },
+      { text: "苦難是人生的老師，通過它我們才能獲得心靈的成長。", author: "—— 托爾斯泰" },
+      { text: "生活就像一面鏡子，你對它笑，它就對你笑。", author: "—— 薩克雷" },
+      { text: "真正的自由不是想做什么就做什么，而是不想做什么就不做什麼。", author: "—— 康德" },
+      { text: "思想決定行動，行動決定習慣，習慣決定性格，性格決定命運。", author: "—— 威廉·詹姆斯" },
+      { text: "無論你認為自己行還是不行，你都是對的。", author: "—— 亨利·福特" },
+      { text: "最好的預測未來的方式，就是去創造它。", author: "—— 亞伯拉罕·林肯" },
+      { text: "成功的秘密在於堅持不懈的目標。", author: "—— 班傑明·迪斯雷利" },
+      { text: "勇敢是面對恐懼時，依然選擇向前跨出一步。", author: "—— 羅斯福" },
+      { text: "永遠保持飢渴，永遠保持愚蠢。", author: "—— 史蒂夫·賈伯斯" },
+      { text: "沒有行動的願景，只是一場白日夢。", author: "—— 柴契爾夫人" },
+      { text: "當你真心渴望某樣東西時，整個宇宙都會聯合起來幫你完成。", author: "—— 保羅·柯賀略" },
+      { text: "愛與被愛，是世上最珍貴的財富。", author: "—— 海倫·凱勒" },
+      { text: "生活在於運動，更在於心靈的沉澱。", author: "—— 伏爾泰" },
+      { text: "快樂不在於擁有許多，而在於要求得少。", author: "—— 伊比鳩魯" },
+      { text: "只有經歷過地獄般的磨練，才能煉出創造天堂的力量。", author: "—— 泰戈爾" },
+      { text: "人生沒有彩排，每天都是現場直播。", author: "—— 喜劇大師卓別林" },
+      { text: "把每一天都當作生命的最後一天來過。", author: "—— 馬可·奧理略" },
+      { text: "微笑是世界上最美麗的語言。", author: "—— 德蕾莎修女" },
+      { text: "善待他人，就是善待自己的靈魂。", author: "—— 塞內卡" },
+      { text: "平靜的心靈是智慧的頂峰。", author: "—— 弗朗西斯·培根" },
+      { text: "不為往事擾，餘生隻願笑。", author: "—— 簡·奧斯汀" },
+      { text: "光陰荏苒，唯有內心的平靜歷久彌新。", author: "—— 赫爾曼·黑塞" },
+      { text: "旅行使人謙遜，因為你看清了自己在這個世界上的微小。", author: "—— 福樓拜" },
+      { text: "對未來最大的慷慨，是把一切獻給現在。", author: "—— 加繆" },
+      { text: "願你眼裡有光，心中有愛，一路向陽。", author: "—— 紀伯倫" },
+      { text: "生活的樂趣在於探索未知的過程。", author: "—— 達爾文" },
+      { text: "順應自然，心隨境轉，便無處不自在。", author: "—— 莊子" },
+      { text: "生活有時給我們重擊，但它也是最溫柔的老師。", author: "—— 羅曼·羅蘭" },
+      { text: "每一朵花都有它開放的時節，不必焦急。", author: "—— 泰戈爾" },
+      { text: "熱愛生活的人，生活也終將熱愛他。", author: "—— 斯賓諾莎" },
+      { text: "心如止水，萬物皆明。", author: "—— 達摩" },
+      { text: "世界很大，慢慢走，細細看。", author: "—— 林語堂" },
+      { text: "溫柔是世界上最強大的力量。", author: "—— 老子" },
+      { text: "給自己多一點耐心，時間會給出最好的答案。", author: "—— 塞內卡" },
+      { text: "願你此行孤單卻不孤獨，豐盈且從容。", author: "—— 祝福語" }
     ];
 
     let isFlipping = false;
@@ -408,7 +459,7 @@
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current_weather=true`;
 
       document.getElementById('tempDisplay').textContent = "讀取...";
-      document.getElementById('outfitText').textContent = "連線更新氣溫中...";
+      document.getElementById('outfitText').textContent = "連線查詢最新天氣與穿搭建議...";
 
       fetch(url)
         .then(res => res.json())
