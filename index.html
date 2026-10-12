@@ -133,6 +133,7 @@
       gap: 4px;
     }
 
+    /* 💴 匯率計算器特化樣式 */
     .currency-header {
       font-size: 1.05rem;
       font-weight: 900;
@@ -143,10 +144,31 @@
       justify-content: space-between;
     }
 
-    .rate-tag {
-      font-size: 0.75rem;
+    .rate-setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-color);
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1.5px dashed var(--border-color);
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--light-text);
-      font-weight: 500;
+    }
+
+    .rate-input {
+      width: 75px;
+      padding: 3px 6px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: #FFF;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: var(--accent-orange);
+      text-align: center;
+      outline: none;
     }
 
     .currency-input-group {
@@ -314,11 +336,15 @@
     </div>
   </div>
 
-  <!-- 💴 日幣匯率計算器 -->
+  <!-- 💴 日幣匯率計算器（含可自訂匯率功能） -->
   <div class="section-card">
     <div class="currency-header">
       <span>💴 日幣匯率計算器</span>
-      <span class="rate-tag" id="rateText">參考匯率約 0.215</span>
+    </div>
+
+    <div class="rate-setting-row">
+      <span>⚙️ 自訂匯率 (1日幣 = ?台幣)</span>
+      <input type="number" id="customRateInput" class="rate-input" value="0.215" step="0.001" oninput="updateCustomRate()">
     </div>
     
     <div class="currency-input-group">
@@ -421,16 +447,24 @@
           .then(function(res) { return res.json(); })
           .then(function(data) {
             if (data && data.rates && data.rates.TWD) {
-              currentRate = data.rates.TWD;
-              var rateElem = document.getElementById('rateText');
-              if (rateElem) rateElem.textContent = '即時匯率約 ' + currentRate.toFixed(4);
+              currentRate = parseFloat(data.rates.TWD.toFixed(4));
+              var rateInput = document.getElementById('customRateInput');
+              if (rateInput) rateInput.value = currentRate;
             }
           })
-          .catch(function(err) {
-            var rateElem = document.getElementById('rateText');
-            if (rateElem) rateElem.textContent = '參考匯率約 ' + currentRate;
-          });
+          .catch(function(err) { console.log(err); });
       } catch(e) { console.log(e); }
+    }
+
+    function updateCustomRate() {
+      var rateInput = document.getElementById('customRateInput');
+      if (rateInput) {
+        var val = parseFloat(rateInput.value);
+        if (!isNaN(val) && val > 0) {
+          currentRate = val;
+          convertCurrency('jpy'); // 匯率更新後自動重算金額
+        }
+      }
     }
 
     function convertCurrency(source) {
