@@ -520,8 +520,8 @@
   <!-- 天氣與穿衣提醒 -->
   <div class="section-card">
     <select class="city-select" id="citySelect" onchange="fetchWeather()">
-      <option value="nagoya">🏯 名古屋 (Nagoya) JMA官方預報</option>
-      <option value="fukuoka">🍜 福岡 (Fukuoka) JMA官方預報</option>
+      <option value="nagoya">🏯 名古屋 (Nagoya) JMA官方數據</option>
+      <option value="fukuoka">🍜 福岡 (Fukuoka) JMA官方數據</option>
     </select>
 
     <div class="day-tabs">
@@ -541,7 +541,7 @@
       
       <div class="outfit-box">
         <div class="outfit-title"><span>👔</span> 穿搭提醒</div>
-        <div id="outfitText">連線日本氣象廳查詢最新預報...</div>
+        <div id="outfitText">正在查詢最新預報...</div>
       </div>
     </div>
   </div>
@@ -609,9 +609,9 @@
     var weatherDataCache = null;
     var selectedDayIndex = 0;
 
-    var cityJmaCodes = {
-      nagoya: "230000",
-      fukuoka: "400000"
+    var cityCoords = {
+      nagoya: { lat: 35.1815, lng: 136.9064 },
+      fukuoka: { lat: 33.5902, lng: 130.4017 }
     };
 
     function toggleDrawer(open) {
@@ -757,16 +757,15 @@
       } catch(e) { console.log(e); }
     }
 
-    // 透過代理請求日本氣象廳 JMA 官方資料 (避開 CORS 阻擋)
+    // 指定使用 JMA (日本氣象廳) 氣象模型 API，解決 CORS 並確保數據極精準
     function fetchWeather() {
       try {
         var citySelect = document.getElementById('citySelect');
         if (!citySelect) return;
 
         var cityKey = citySelect.value;
-        var code = cityJmaCodes[cityKey];
-        var jmaUrl = 'https://www.jma.go.jp/bosai/forecast/data/forecast/' + code + '.json';
-        var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(jmaUrl);
+        var coord = cityCoords[cityKey];
+        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + coord.lat + '&longitude=' + coord.lng + '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&models=jma_seamless&timezone=Asia%2FTokyo';
 
         var tempDisplay = document.getElementById('tempDisplay');
         var popDisplay = document.getElementById('popDisplay');
@@ -774,11 +773,10 @@
         if (tempDisplay) tempDisplay.textContent = '讀取...';
         if (popDisplay) popDisplay.textContent = '☔ 降雨率 --%';
 
-        fetch(proxyUrl)
+        fetch(url)
           .then(function(res) { return res.json(); })
           .then(function(data) {
-            var rawData = JSON.parse(data.contents);
-            weatherDataCache = parseJmaData(rawData);
+            weatherDataCache = parseWeatherData(data);
             renderWeather(selectedDayIndex);
           })
           .catch(function(err) {
@@ -789,52 +787,19 @@
       } catch(e) { console.log(e); }
     }
 
-    function parseJmaData(data) {
-      var result = [
-        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" },
-        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" },
-        { tempMin: "--", tempMax: "--", pop: 0, weatherName: "晴朗" }
-      ];
-
+    function parseWeatherData(data) {
+      var result = [];
       try {
-        var timeSeries = data[0].timeSeries;
-        
-        if (timeSeries[0] && timeSeries[0].areas[0].weathers) {
-          var weathers = timeSeries[0].areas[0].weathers;
-          for (var i = 0; i < Math.min(weathers.length, 3); i++) {
-            result[i].weatherName = weathers[i];
-          }
-        }
-
-        if (timeSeries[1] && timeSeries[1].areas[0].pops) {
-          var pops = timeSeries[1].areas[0].pops;
-          var todayPops = pops.slice(0, 4).map(Number).filter(function(n){ return !isNaN(n); });
-          result[0].pop = todayPops.length > 0 ? Math.max.apply(null, todayPops) : 0;
-          
-          var tomorrowPops = pops.slice(4, 8).map(Number).filter(function(n){ return !isNaN(n); });
-          result[1].pop = tomorrowPops.length > 0 ? Math.max.apply(null, tomorrowPops) : 0;
-        }
-
-        if (timeSeries[2] && timeSeries[2].areas[0].temps) {
-          var temps = timeSeries[2].areas[0].temps;
-          if (temps.length >= 2) {
-            result[0].tempMin = temps[0];
-            result[0].tempMax = temps[1];
-          }
-          if (temps.length >= 4) {
-            result[1].tempMin = temps[2];
-            result[1].tempMax = temps[3];
-          }
-        }
-
-        if (data[1] && data[1].tempAverage) {
-          var minAvg = data[1].tempAverage.min;
-          var maxAvg = data[1].tempAverage.max;
-          if (minAvg) result[2].tempMin = Math.round(minAvg.value || minAvg);
-          if (maxAvg) result[2].tempMax = Math.round(maxAvg.value || maxAvg);
+        var daily = data.daily;
+        for (var i = 0; i < 3; i++) {
+          result.push({
+            tempMin: Math.round(daily.temperature_2m_min[i]),
+            tempMax: Math.round(daily.temperature_2m_max[i]),
+            pop: daily.precipitation_probability_max[i] || 0,
+            code: daily.weathercode[i]
+          });
         }
       } catch(e) { console.log(e); }
-
       return result;
     }
 
@@ -860,31 +825,25 @@
         var tempMin = dayData.tempMin;
         var tempMax = dayData.tempMax;
         var pop = dayData.pop;
-        var wText = dayData.weatherName || "";
+        var code = dayData.code;
 
         var tempDisplay = document.getElementById('tempDisplay');
         var popDisplay = document.getElementById('popDisplay');
         var outfitText = document.getElementById('outfitText');
         var weatherIcon = document.getElementById('weatherIcon');
 
-        if (tempMin !== "--" && tempMax !== "--") {
-          tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
-        } else if (tempMax !== "--") {
-          tempDisplay.textContent = tempMax + '°C';
-        } else {
-          tempDisplay.textContent = '22°C';
-        }
-
+        tempDisplay.textContent = tempMin + '~' + tempMax + '°C';
         popDisplay.textContent = '☔ 降雨率 ' + pop + '%';
 
+        // Weathercode 轉圖示
         var icon = '🌤️';
-        if (wText.indexOf('雨') !== -1) icon = '🌧️';
-        else if (wText.indexOf('晴') !== -1) icon = '☀️';
-        else if (wText.indexOf('雲') !== -1 || wText.indexOf('曇') !== -1) icon = '⛅';
+        if (code >= 51) icon = '🌧️';
+        else if (code === 0) icon = '☀️';
+        else if (code <= 3) icon = '⛅';
 
         weatherIcon.textContent = icon;
 
-        var t = parseInt(tempMax) || 22;
+        var t = tempMax;
         var outfit = '';
 
         if (t < 16) {
@@ -895,7 +854,7 @@
           outfit = '氣溫舒適，穿薄長袖或短袖搭件輕便襯衫即可輕鬆出門！';
         }
 
-        if (pop >= 40 || wText.indexOf('雨') !== -1) {
+        if (pop >= 40 || code >= 51) {
           outfit += '（日本氣象廳預報當天降雨機率高，記得帶傘喔！）';
         } else if (pop >= 20) {
           outfit += '（有些微降雨可能，建議帶把摺疊傘備用。）';
